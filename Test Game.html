@@ -675,14 +675,14 @@
 
         // --- Portal/World switching logic ---
 
-        function hideAllWorlds() {
+       function hideAllWorlds() {
     // Hide all world contents
     document.getElementById('world1Content').classList.add('hidden');
     document.getElementById('world2Content').classList.add('hidden');
     document.getElementById('world3Content').classList.add('hidden');
     document.getElementById('world4Content').classList.add('hidden');
     document.getElementById('world5Content').classList.add('hidden');
-    document.getElementById('worldMinus1Content').classList.add('hidden'); // Make sure World (-1) is hidden
+    document.getElementById('worldMinus1Content').classList.add('hidden'); // Ensure World -1 is hidden
 }
 
 function enterWorldMinus1() {
@@ -690,13 +690,19 @@ function enterWorldMinus1() {
     gameState.currentWorld = -1; // Set the current world to -1
     document.body.className = 'worldMinus1'; // Change the body class
     document.getElementById('worldMinus1Content').classList.remove('hidden'); // Show World (-1)
+     updateDisplay();
+            saveGame();
 }
 
-function returnToWorld1Again() {
+function returnToWorld1() {
     hideAllWorlds(); // Hide all other worlds
     gameState.currentWorld = 1; // Set the current world to 1
     document.body.className = 'world1'; // Change the body class
     document.getElementById('world1Content').classList.remove('hidden'); // Show World 1
+
+   updateDisplay();
+            saveGame();
+  
 }
        
 
@@ -751,17 +757,7 @@ function returnToWorld1Again() {
 
        
     
-        function returnToWorld1() {
-            gameState.currentWorld = 1;
-            document.body.className = 'world1';
-            document.getElementById('world1Content').classList.remove('hidden');
-            document.getElementById('world2Content').classList.add('hidden');
-            document.getElementById('world3Content').classList.add('hidden');
-            document.getElementById('world4Content').classList.add('hidden');
-            document.getElementById('world5Content').classList.add('hidden');
-            updateDisplay();
-            saveGame();
-        }
+      
         function returnToWorld2() {
             gameState.currentWorld = 2;
             document.body.className = 'world2';
