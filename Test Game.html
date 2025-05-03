@@ -64,6 +64,10 @@
             background-color: #d32f2f;
             color: white;
         }
+        #ultraCelestialButton {
+            background-color: #6a1b9a;
+            color: white;
+        }
         .hidden {
             display: none;
         }
@@ -107,7 +111,10 @@
     <!-- WORLD 2 CONTENT -->
     <div id="world2Content" class="hidden">
         <div class="world-title">World 2 - Master Realm</div>
-        
+
+
+        <div class="stat">Ultra Celestials: <span id="ultraCelestialCount">0</span> 
+            <span class="generation-stat" id="ultraCelestialGen">(+0.00/s)</span></div>
         <div class="stat">Celestials: <span id="celestialCount">0</span> 
             <span class="generation-stat" id="celestialGen">(+0.00/s)</span></div>
         <div class="stat">Elite Masters: <span id="eliteMasterCount">0</span> 
@@ -122,7 +129,8 @@
         <button id="masterButton" disabled>Master (100 Super Prestiges)</button>
         <button id="eliteMasterButton" disabled>Elite Master (100 Masters)</button>
         <button id="celestialButton" disabled>Celestial (10 Elite Masters)</button>
-        
+        <button id="ultraCelestialButton" disabled>Ultra Celestial (15 Celestials)</button>
+
         <button id="returnButton" onclick="returnToWorld1()">Return to World 1</button>
     </div>
 
@@ -136,6 +144,7 @@
             masters: 0,
             eliteMasters: 0,
             celestials: 0,
+            ultraCelestials: 0,
             totalClicks: 0,
             autoClicks: 0,
             currentWorld: 1,
@@ -145,7 +154,9 @@
                 superPrestiges: 0,
                 masters: 0,
                 eliteMasters: 0,
-                celestials: 0
+                celestials: 0,
+                ultraCelestials: 0
+
             }
         };
 
@@ -170,6 +181,7 @@
             document.getElementById('masterCount').textContent = format(gameState.masters);
             document.getElementById('eliteMasterCount').textContent = format(gameState.eliteMasters);
             document.getElementById('celestialCount').textContent = format(gameState.celestials);
+            document.getElementById('ultraCelestialCount').textContent = format(gameState.ultraCelestials);
             document.getElementById('autoClickCount2').textContent = format(gameState.autoClicks);
             document.getElementById('boostAmount2').textContent = format(totalBoost * 100);
 
@@ -181,7 +193,8 @@
             document.getElementById('masterButton').disabled = gameState.superPrestiges < 100;
             document.getElementById('eliteMasterButton').disabled = gameState.masters < 100;
             document.getElementById('celestialButton').disabled = gameState.eliteMasters < 10;
-            
+            document.getElementById('ultraCelestialButton').disabled = gameState.celestials < 15;
+
             // Show portal when player has 1+ super prestiges
             if (gameState.superPrestiges >= 1) {
                 document.getElementById('portalButton').classList.remove('hidden');
@@ -253,6 +266,8 @@
                    (1 + 5 * gameState.masters) *
                    (1 + 10 * gameState.eliteMasters) *
                    (1 + 20 * gameState.celestials) - 1;
+                   (1 + 50 * gameState.ultraCelestials) - 1;
+
         }
 
         function getClickPower() {
@@ -346,6 +361,15 @@
                 saveGame();
             }
         }
+        function becomeUltraCelestial() {
+             if (gameState.celestials >= 15) {
+             gameState.celestials -= 15;
+             gameState.ultraCelestials++;
+             gameState.autoClicks += 1000;
+             updateDisplay();
+             saveGame();
+             }
+         }
 
         function enterPortal() {
             gameState.currentWorld = 2;
@@ -417,7 +441,7 @@
         document.getElementById('masterButton').addEventListener('click', becomeMaster);
         document.getElementById('eliteMasterButton').addEventListener('click', becomeEliteMaster);
         document.getElementById('celestialButton').addEventListener('click', becomeCelestial);
-        
+        document.getElementById('ultraCelestialButton').addEventListener('click', becomeUltraCelestial);
         window.onload = loadGame;
         setInterval(gameLoop, 100);
     </script>
