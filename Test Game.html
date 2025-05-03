@@ -206,6 +206,13 @@
             <button onclick="closeStatsTab()">Close</button>
         </div>
     </div>
+    <!-- WORLD -1 CONTENT -->
+    <div id="worldMinus1Content" class="hidden">
+    <div class="world-title">World -1 - April Fools' World</div>
+    <div class="stat">Super Quantum Prestige Count: <span id="superQuantumPrestigeCount">0</span></div>
+    <button id="superQuantumPrestigeButton">Super Quantum Prestige</button>
+    <button id="returnToWorld1Button" onclick="returnToWorld1()">Return to World 1</button>
+</div>
     <!-- WORLD 1 CONTENT -->
     <div id="world1Content">
         <div class="world-title">World 1 - Core Dimension</div>
@@ -319,13 +326,7 @@
         <button id="vortexButton" disabled>Vortex (9 Neutrons)</button>
         <button id="returnButton4" onclick="returnToWorld4()">Return to World 4</button>
     </div>
-    <!-- WORLD -1 CONTENT -->
-    <div id="worldMinus1Content" class="hidden">
-    <div class="world-title">World -1 - April Fools' World</div>
-    <div class="stat">Super Quantum Prestige Count: <span id="superQuantumPrestigeCount">0</span></div>
-    <button id="superQuantumPrestigeButton">Super Quantum Prestige</button>
-    <button id="returnToWorld1Button" onclick="returnToWorld1()">Return to World 1</button>
-</div>
+    
     <script>
         // --- Core State ---
         const defaultState = {
