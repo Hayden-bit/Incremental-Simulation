@@ -64,10 +64,6 @@
             background-color: #d32f2f;
             color: white;
         }
-         #ultraCelestialButton {
-            background-color: #d32f2f;
-            color: white;
-        }
         .hidden {
             display: none;
         }
@@ -112,8 +108,6 @@
     <div id="world2Content" class="hidden">
         <div class="world-title">World 2 - Master Realm</div>
         
-        <div class="stat">Ultra Celestials: <span id="ultraCelestialCount">0</span> 
-            <span class="generation-stat" id="ultraCelestialGen">(+0.00/s)</span></div>
         <div class="stat">Celestials: <span id="celestialCount">0</span> 
             <span class="generation-stat" id="celestialGen">(+0.00/s)</span></div>
         <div class="stat">Elite Masters: <span id="eliteMasterCount">0</span> 
@@ -128,8 +122,7 @@
         <button id="masterButton" disabled>Master (100 Super Prestiges)</button>
         <button id="eliteMasterButton" disabled>Elite Master (100 Masters)</button>
         <button id="celestialButton" disabled>Celestial (10 Elite Masters)</button>
-        <button id="ultraCelestialButton" disabled> Ultra Celestial (15 Celestials)</button>
-
+        
         <button id="returnButton" onclick="returnToWorld1()">Return to World 1</button>
     </div>
 
@@ -143,7 +136,6 @@
             masters: 0,
             eliteMasters: 0,
             celestials: 0,
-            ultraCelestials: 0,
             totalClicks: 0,
             autoClicks: 0,
             currentWorld: 1,
@@ -154,8 +146,6 @@
                 masters: 0,
                 eliteMasters: 0,
                 celestials: 0
-                ultraCelestials: 0
-
             }
         };
 
@@ -180,8 +170,6 @@
             document.getElementById('masterCount').textContent = format(gameState.masters);
             document.getElementById('eliteMasterCount').textContent = format(gameState.eliteMasters);
             document.getElementById('celestialCount').textContent = format(gameState.celestials);
-             document.getElementById('ultraCelestialCount').textContent = format(gameState.ultraCelestials);
-
             document.getElementById('autoClickCount2').textContent = format(gameState.autoClicks);
             document.getElementById('boostAmount2').textContent = format(totalBoost * 100);
 
@@ -193,8 +181,7 @@
             document.getElementById('masterButton').disabled = gameState.superPrestiges < 100;
             document.getElementById('eliteMasterButton').disabled = gameState.masters < 100;
             document.getElementById('celestialButton').disabled = gameState.eliteMasters < 10;
-            document.getElementById('ultraCelestialButton').disabled = gameState.eliteMasters < 15;
-
+            
             // Show portal when player has 1+ super prestiges
             if (gameState.superPrestiges >= 1) {
                 document.getElementById('portalButton').classList.remove('hidden');
@@ -214,7 +201,6 @@
             document.getElementById('masterGen').textContent = `(+${spGenRate.toFixed(2)}/s)`;
             document.getElementById('eliteMasterGen').textContent = `(+${mGenRate.toFixed(2)}/s)`;
             document.getElementById('celestialGen').textContent = `(+${emGenRate.toFixed(2)}/s)`;
-            document.getElementById('ultraCelestialGen').textContent = `(+${ucGenRate.toFixed(2)}/s)`;
             document.getElementById('superPrestigeGen2').textContent = `(+${pGenRate.toFixed(2)}/s)`;
         }
 
@@ -256,15 +242,6 @@
                 if (whole > 0) {
                     gameState.eliteMasters += whole;
                     gameState.fractional.eliteMasters -= whole;
-                }
-            }
-// here number needs to be fixed
-            if (gameState.ultraCelestials > 0) {
-                gameState.fractional.celestials += gameState.ultraCelestials * 0.005 * deltaTime;
-                const whole = Math.floor(gameState.fractional.celestials);
-                if (whole > 0) {
-                    gameState.celestials += whole;
-                    gameState.fractional.celestials -= whole;
                 }
             }
         }
@@ -370,16 +347,6 @@
             }
         }
 
-           function becomeUltraCelestial() {
-            if (gameState.celestials >= 15) {
-                gameState.celestials -= 15;
-                gameState.ultraCelestials++;
-                gameState.autoClicks += 500;
-                updateDisplay();
-                saveGame();
-            }
-        }
-
         function enterPortal() {
             gameState.currentWorld = 2;
             document.body.className = 'world2';
@@ -450,8 +417,7 @@
         document.getElementById('masterButton').addEventListener('click', becomeMaster);
         document.getElementById('eliteMasterButton').addEventListener('click', becomeEliteMaster);
         document.getElementById('celestialButton').addEventListener('click', becomeCelestial);
-        document.getElementById('ultraCelestialButton').addEventListener('click', becomeUltraCelestial);
-
+        
         window.onload = loadGame;
         setInterval(gameLoop, 100);
     </script>
