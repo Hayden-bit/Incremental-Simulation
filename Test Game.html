@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clicking Game - Final</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            transition: background-color 0.5s;
+        }
+        .world1 {
+            background-color: #f0f8ff;
+        }
+        .world2 {
+            background-color: #fff0f5;
+        }
+        #clickButton {
+            padding: 20px;
+            font-size: 24px;
+            margin: 20px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .stat {
+            margin: 10px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            display: inline-block;
+            border-radius: 5px;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #restartButton {
+            background-color: #ff4444;
+            color: white;
+            margin-top: 20px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        #portalButton {
+            background-color: #ff9800;
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            margin: 10px;
+        }
+        #masterButton {
+            background-color: #607d8b;
+            color: white;
+        }
+        #eliteMasterButton {
+            background-color: #795548;
+            color: white;
+        }
+        #celestialButton {
+            background-color: #d32f2f;
+            color: white;
+        }
+        .hidden {
+            display: none;
+        }
+        .world-title {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .generation-stat {
+            color: #2e7d32;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="world1">
+    <!-- WORLD 1 CONTENT -->
+    <div id="world1Content">
+        <div class="world-title">World 1 - Core Dimension</div>
+        
+        <div class="stat">Total Super Prestiges: <span id="superPrestigeCount">0</span> 
+            <span class="generation-stat" id="superPrestigeGen">(+0.00/s)</span></div>
+        <div class="stat">Total Prestiges: <span id="prestigeCount">0</span> 
+            <span class="generation-stat" id="prestigeGen">(+0.00/s)</span></div>
+        <div class="stat">Ultra Rebirhs: <span id="ultraRebirthCount">0</span></div>
+        <div class="stat">Total Rebirhs: <span id="rebirthCount">0</span></div>
+        <div class="stat">Total Clicks: <span id="clickCount">0</span></div>
+        <div class="stat">Auto Clicks: <span id="autoClickCount">0</span></div>
+        <div class="stat">Boost: <span id="boostAmount">0</span>%</div>
+        
+        <button id="clickButton">CLICK ME!</button><br>
+        
+        <button id="rebirthButton" disabled>Rebirth (50 clicks)</button>
+        <button id="ultraRebirthButton" disabled>Ultra Rebirth (100 clicks + 5 rebirhs)</button>
+        <button id="prestigeButton" disabled>Prestige (500 clicks)</button>
+        <button id="superPrestigeButton" disabled>Super Prestige (10 prestiges)</button>
+        <button id="portalButton" class="hidden">Enter Portal (Requires 1 Super Prestige)</button>
+        <br>
+        <button id="restartButton" onclick="restartGame()">Restart Game</button>
+    </div>
+
+    <!-- WORLD 2 CONTENT -->
+    <div id="world2Content" class="hidden">
+        <div class="world-title">World 2 - Master Realm</div>
+        
+        <div class="stat">Celestials: <span id="celestialCount">0</span> 
+            <span class="generation-stat" id="celestialGen">(+0.00/s)</span></div>
+        <div class="stat">Elite Masters: <span id="eliteMasterCount">0</span> 
+            <span class="generation-stat" id="eliteMasterGen">(+0.00/s)</span></div>
+        <div class="stat">Masters: <span id="masterCount">0</span> 
+            <span class="generation-stat" id="masterGen">(+0.00/s)</span></div>
+        <div class="stat">Super Prestiges: <span id="superPrestigeCount2">0</span> 
+            <span class="generation-stat" id="superPrestigeGen2">(+0.00/s)</span></div>
+        <div class="stat">Auto Clicks: <span id="autoClickCount2">0</span></div>
+        <div class="stat">Total Boost: <span id="boostAmount2">0</span>%</div>
+        
+        <button id="celestialButton" disabled>Celestial (10 Elite Masters)</button>
+        <button id="eliteMasterButton" disabled>Elite Master (100 Masters)</button>
+        <button id="masterButton" disabled>Master (100 Super Prestiges)</button>
+        <button id="returnButton" onclick="returnToWorld1()">Return to World 1</button>
+    </div>
+
+    <script>
+        const defaultState = {
+            clicks: 0,
+            rebirths: 0,
+            ultraRebirths: 0,
+            prestiges: 0,
+            superPrestiges: 0,
+            masters: 0,
+            eliteMasters: 0,
+            celestials: 0,
+            totalClicks: 0,
+            autoClicks: 0,
+            currentWorld: 1,
+            lastGenTime: Date.now(),
+            fractional: {
+                prestiges: 0,
+                superPrestiges: 0,
+                masters: 0,
+                eliteMasters: 0,
+                celestials: 0
+            }
+        };
+
+        let gameState = {...defaultState};
+
+        function updateDisplay() {
+            const format = num => Math.floor(num).toString();
+            
+            // Update World 1 displays
+            document.getElementById('clickCount').textContent = format(gameState.clicks);
+            document.getElementById('rebirthCount').textContent = format(gameState.rebirths);
+            document.getElementById('ultraRebirthCount').textContent = format(gameState.ultraRebirths);
+            document.getElementById('prestigeCount').textContent = format(gameState.prestiges);
+            document.getElementById('superPrestigeCount').textContent = format(gameState.superPrestiges);
+            document.getElementById('autoClickCount').textContent = format(gameState.autoClicks);
+            
+            const totalBoost = calculateTotalBoost();
+            document.getElementById('boostAmount').textContent = format(totalBoost * 100);
+
+            // Update World 2 displays
+            document.getElementById('superPrestigeCount2').textContent = format(gameState.superPrestiges);
+            document.getElementById('masterCount').textContent = format(gameState.masters);
+            document.getElementById('eliteMasterCount').textContent = format(gameState.eliteMasters);
+            document.getElementById('celestialCount').textContent = format(gameState.celestials);
+            document.getElementById('autoClickCount2').textContent = format(gameState.autoClicks);
+            document.getElementById('boostAmount2').textContent = format(totalBoost * 100);
+
+            // Update buttons
+            document.getElementById('rebirthButton').disabled = gameState.clicks < 50;
+            document.getElementById('ultraRebirthButton').disabled = gameState.clicks < 100 || gameState.rebirths < 5;
+            document.getElementById('prestigeButton').disabled = gameState.clicks < 500;
+            document.getElementById('superPrestigeButton').disabled = gameState.prestiges < 10;
+            document.getElementById('masterButton').disabled = gameState.superPrestiges < 100;
+            document.getElementById('eliteMasterButton').disabled = gameState.masters < 100;
+            document.getElementById('celestialButton').disabled = gameState.eliteMasters < 10;
+            
+            // Show portal when player has 1+ super prestiges
+            if (gameState.superPrestiges >= 1) {
+                document.getElementById('portalButton').classList.remove('hidden');
+            }
+            
+            updateGenerationDisplay();
+        }
+
+        function updateGenerationDisplay() {
+            const spGenRate = gameState.masters * 0.1;
+            const pGenRate = gameState.superPrestiges * 0.05;
+            const mGenRate = gameState.eliteMasters * 0.02;
+            const emGenRate = gameState.celestials * 0.005;
+
+            document.getElementById('superPrestigeGen').textContent = `(+${spGenRate.toFixed(2)}/s)`;
+            document.getElementById('prestigeGen').textContent = `(+${pGenRate.toFixed(2)}/s)`;
+            document.getElementById('masterGen').textContent = `(+${spGenRate.toFixed(2)}/s)`;
+            document.getElementById('eliteMasterGen').textContent = `(+${mGenRate.toFixed(2)}/s)`;
+            document.getElementById('celestialGen').textContent = `(+${emGenRate.toFixed(2)}/s)`;
+            document.getElementById('superPrestigeGen2').textContent = `(+${pGenRate.toFixed(2)}/s)`;
+        }
+
+        function generateResources() {
+            const now = Date.now();
+            const deltaTime = (now - gameState.lastGenTime) / 1000;
+            gameState.lastGenTime = now;
+            
+            if (gameState.masters > 0) {
+                gameState.fractional.superPrestiges += gameState.masters * 0.1 * deltaTime;
+                const whole = Math.floor(gameState.fractional.superPrestiges);
+                if (whole > 0) {
+                    gameState.superPrestiges += whole;
+                    gameState.fractional.superPrestiges -= whole;
+                }
+            }
+            
+            if (gameState.superPrestiges > 0) {
+                gameState.fractional.prestiges += gameState.superPrestiges * 0.05 * deltaTime;
+                const whole = Math.floor(gameState.fractional.prestiges);
+                if (whole > 0) {
+                    gameState.prestiges += whole;
+                    gameState.fractional.prestiges -= whole;
+                }
+            }
+            
+            if (gameState.eliteMasters > 0) {
+                gameState.fractional.masters += gameState.eliteMasters * 0.02 * deltaTime;
+                const whole = Math.floor(gameState.fractional.masters);
+                if (whole > 0) {
+                    gameState.masters += whole;
+                    gameState.fractional.masters -= whole;
+                }
+            }
+
+            if (gameState.celestials > 0) {
+                gameState.fractional.eliteMasters += gameState.celestials * 0.005 * deltaTime;
+                const whole = Math.floor(gameState.fractional.eliteMasters);
+                if (whole > 0) {
+                    gameState.eliteMasters += whole;
+                    gameState.fractional.eliteMasters -= whole;
+                }
+            }
+        }
+
+        function calculateTotalBoost() {
+            return (1 + gameState.rebirths * (1 + 0.1 * gameState.ultraRebirths)) * 
+                   (1 + 0.5 * gameState.prestiges) * 
+                   (1 + 2 * gameState.superPrestiges) *
+                   (1 + 5 * gameState.masters) *
+                   (1 + 10 * gameState.eliteMasters) *
+                   (1 + 20 * gameState.celestials) - 1;
+        }
+
+        function getClickPower() {
+            return (1 + gameState.rebirths * (1 + 0.1 * gameState.ultraRebirths)) * 
+                   (1 + 0.5 * gameState.prestiges) * 
+                   (1 + 2 * gameState.superPrestiges) *
+                   (1 + 5 * gameState.masters) *
+                   (1 + 10 * gameState.eliteMasters) *
+                   (1 + 20 * gameState.celestials);
+        }
+
+        function click() {
+            const power = getClickPower();
+            gameState.clicks += power;
+            gameState.totalClicks += power;
+            updateDisplay();
+            saveGame();
+        }
+
+        function rebirth() {
+            if (gameState.clicks >= 50) {
+                gameState.clicks -= 50;
+                gameState.rebirths++;
+                updateDisplay();
+                saveGame();
+            }
+        }
+
+        function ultraRebirth() {
+            if (gameState.clicks >= 100 && gameState.rebirths >= 5) {
+                gameState.clicks -= 100;
+                gameState.rebirths -= 5;
+                gameState.ultraRebirths++;
+                gameState.autoClicks++;
+                updateDisplay();
+                saveGame();
+            }
+        }
+
+        function prestige() {
+            if (gameState.clicks >= 500) {
+                gameState.prestiges++;
+                gameState.autoClicks += 3;
+                gameState.clicks = 0;
+                gameState.rebirths = 0;
+                gameState.ultraRebirths = 0;
+                updateDisplay();
+                saveGame();
+            }
+        }
+
+        function superPrestige() {
+            if (gameState.prestiges >= 10) {
+                gameState.superPrestiges++;
+                gameState.autoClicks += 10;
+                gameState.prestiges = 0;
+                gameState.clicks = 0;
+                gameState.rebirths = 0;
+                gameState.ultraRebirths = 0;
+                updateDisplay();
+                saveGame();
+            }
+        }
+
+        function becomeMaster() {
+            if (gameState.superPrestiges >= 100) {
+                gameState.superPrestiges -= 100;
+                gameState.masters++;
+                gameState.autoClicks += 50;
+                updateDisplay();
+                saveGame();
+            }
+        }
+
+        function becomeEliteMaster() {
+            if (gameState.masters >= 100) {
+                gameState.masters -= 100;
+                gameState.eliteMasters++;
+                gameState.autoClicks += 200;
+                updateDisplay();
+                saveGame();
+            }
+        }
+
+        function becomeCelestial() {
+            if (gameState.eliteMasters >= 10) {
+                gameState.eliteMasters -= 10;
+                gameState.celestials++;
+                gameState.autoClicks += 500;
+                updateDisplay();
+                saveGame();
+            }
+        }
+
+        function enterPortal() {
+            gameState.currentWorld = 2;
+            document.body.className = 'world2';
+            document.getElementById('world1Content').classList.add('hidden');
+            document.getElementById('world2Content').classList.remove('hidden');
+            updateDisplay();
+            saveGame();
+        }
+
+        function returnToWorld1() {
+            gameState.currentWorld = 1;
+            document.body.className = 'world1';
+            document.getElementById('world1Content').classList.remove('hidden');
+            document.getElementById('world2Content').classList.add('hidden');
+            updateDisplay();
+            saveGame();
+        }
+
+        function restartGame() {
+            if (confirm("Are you sure you want to restart? All progress will be lost!")) {
+                gameState = {...defaultState};
+                localStorage.removeItem('clickerSave');
+                if (gameState.currentWorld === 2) returnToWorld1();
+                updateDisplay();
+            }
+        }
+
+        function gameLoop() {
+            generateResources();
+            
+            if (gameState.autoClicks > 0) {
+                const autoPower = gameState.autoClicks * getClickPower();
+                gameState.clicks += autoPower;
+                gameState.totalClicks += autoPower;
+            }
+            
+            updateDisplay();
+            saveGame();
+        }
+
+        function saveGame() {
+            localStorage.setItem('clickerSave', JSON.stringify(gameState));
+        }
+
+        function loadGame() {
+            try {
+                const save = JSON.parse(localStorage.getItem('clickerSave'));
+                if (save) {
+                    gameState = {...defaultState, ...save};
+                    gameState.lastGenTime = Date.now();
+                    if (gameState.currentWorld === 2) {
+                        document.body.className = 'world2';
+                        document.getElementById('world1Content').classList.add('hidden');
+                        document.getElementById('world2Content').classList.remove('hidden');
+                    }
+                }
+            } catch(e) {}
+            updateDisplay();
+        }
+
+        // Event listeners
+        document.getElementById('clickButton').addEventListener('click', click);
+        document.getElementById('rebirthButton').addEventListener('click', rebirth);
+        document.getElementById('ultraRebirthButton').addEventListener('click', ultraRebirth);
+        document.getElementById('prestigeButton').addEventListener('click', prestige);
+        document.getElementById('superPrestigeButton').addEventListener('click', superPrestige);
+        document.getElementById('portalButton').addEventListener('click', enterPortal);
+        document.getElementById('masterButton').addEventListener('click', becomeMaster);
+        document.getElementById('eliteMasterButton').addEventListener('click', becomeEliteMaster);
+        document.getElementById('celestialButton').addEventListener('click', becomeCelestial);
+        
+        window.onload = loadGame;
+        setInterval(gameLoop, 100);
+    </script>
+</body>
+</html>
