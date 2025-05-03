@@ -329,6 +329,13 @@
     </div>
     
     <script>
+
+        //World -1 click code
+
+        document.getElementById('superQuantumPrestigeButton').addEventListener('click', function () {
+    gameState.superQuantumPrestige++; // Increment the stat
+    document.getElementById('superQuantumPrestigeCount').textContent = gameState.superQuantumPrestige; // Update the displayed text
+});
         // --- Core State ---
         const defaultState = {
             clicks: 0,
